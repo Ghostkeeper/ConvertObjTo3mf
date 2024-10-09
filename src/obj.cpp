@@ -37,9 +37,9 @@ float Obj::is_obj(const std::string& filename) {
 	size_t sample_size = file_handle.tellg();
 	file_handle.seekg(file_handle.beg);
 	sample_size = std::min(sample_size, size_t(1024)); //Limit to 1kB.
-	char sample_chars[sample_size];
-	file_handle.read(sample_chars, sample_size);
-	std::string sample(sample_chars); //We've read up to 1kB from this file now.
+	std::vector<char> buffer(sample_size);
+	file_handle.read(&buffer.front(), sample_size);
+	std::string sample(buffer.data(), buffer.size()); //We've read up to 1kB from this file now.
 
 	//Match a line with this complicated regex that captures almost every possible line in OBJ files.
 	const std::regex correct_line("^\\\\?$|((#|mtllib |usemtl |o |g |s |mg |cstype ).*|v[np]? [-+]?\\d*\\.?\\d+([eE][-+]?\\d+)? [-+]?\\d*\\.?\\d+([eE][-+]?\\d+)? [-+]?\\d*\\.?\\d+([eE][-+]?\\d+)?|vt [-+]?\\d*\\.?\\d+([eE][-+]?\\d+)? [-+]?\\d*\\.?\\d+([eE][-+]?\\d+)?|(f|p|l|curv|curv2|surf)( -?\\d+(\\/\\d*)?(\\/\\d+)?)+)\\\\?");
@@ -90,7 +90,7 @@ std::vector<std::string> Obj::preprocess(const std::string& filename) const {
 		}
 
 		//Process line continuation.
-		if(!lines.empty() && lines.back()[lines.back().length() - 1] == '\\') { //Previous line had a line continuation.
+		if(!lines.empty() && lines.back().length() > 0 && lines.back()[lines.back().length() - 1] == '\\') { //Previous line had a line continuation.
 			lines[lines.size() - 1][lines.back().length() - 1] = ' '; //Turn the backslash into a space.
 			lines[lines.size() - 1] += line; //Add the new line.
 		} else {

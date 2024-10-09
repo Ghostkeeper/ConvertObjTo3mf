@@ -8,6 +8,7 @@
 
 #include <fstream> //To read binary STL files.
 #include <iostream> //To message progress.
+#include <array>
 
 #include "stl_binary.hpp" //The definitions for this file.
 

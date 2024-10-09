@@ -34,9 +34,9 @@ float StlAscii::is_stl_ascii(const std::string& filename) {
 	size_t sample_size = file_handle.tellg();
 	file_handle.seekg(file_handle.beg);
 	sample_size = std::min(sample_size, size_t(1024)); //Limit to 1kB.
-	char sample_chars[sample_size];
-	file_handle.read(sample_chars, sample_size);
-	std::string sample(sample_chars); //We've read up to 1kB from this file now.
+	std::vector<char> buffer(sample_size);
+	file_handle.read(&buffer.front(), sample_size);
+	std::string sample(buffer.data(), buffer.size()); //We've read up to 1kB from this file now.
 
 	//Match a line with this regex that matches on the possible lines of ASCII STL.
 	const std::regex correct_line("^\\s*$|\\s*solid.*|\\s*facet\\s*|\\s*facet normal .*|\\s*outer loop\\s*|\\s*vertex .*|\\s*endloop\\s*|\\s*endfacet\\s*|\\s*endsolid.*");
